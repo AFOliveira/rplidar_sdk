@@ -125,6 +125,12 @@ namespace sl {
         return getAngle(a) < getAngle(b);
     }
 
+    // A function object, not a function pointer, so std::sort can inline the comparison.
+    template <class TNode>
+    struct AngleLess {
+        bool operator()(const TNode& a, const TNode& b) const { return angleLessThan(a, b); }
+    };
+
     template < class TNode >
     static sl_result ascendScanData_(TNode * nodebuffer, size_t count)
     {
@@ -178,7 +184,7 @@ namespace sl {
         }
 
         // Reorder the scan according to the angle value
-        std::sort(nodebuffer, nodebuffer + count, &angleLessThan<TNode>);
+        std::sort(nodebuffer, nodebuffer + count, AngleLess<TNode>());
 
         return SL_RESULT_OK;
     }
